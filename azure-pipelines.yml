@@ -3,15 +3,24 @@
 # Add steps that run tests, create a NuGet package, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-trigger:
-- master
+trigger: 'none' # will disable CI builds entirely
 
 pool:
-  vmImage: 'ubuntu-18.04'
-
+  vmImage: 'windows-2019'
+    
 variables:
-  buildConfiguration: 'Release'
-
+  BuildConfiguration: release
+  
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: UseDotNet@2
+  displayName: Install .NET 6 sdk
+  inputs:
+    packageType: sdk
+    version: 6.0.x
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+- task: DotNetCoreCLI@2
+  displayName: Restore Nuget Packages
+  inputs:
+    command: restore
+    projects: '**/WebApp.csproj'
